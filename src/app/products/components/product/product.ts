@@ -26,23 +26,31 @@ export class ProductComponent implements OnInit{
 
   addProduct(product: Product): void {
     if(product.id > 0){
-      this.products = this.products.map(prod => {
-        if(prod.id == product.id){
-          return {... product}
-        }else{
-          return prod;
-        }
+      this.service.update(product).subscribe( productUpdated => {
+
+        this.products = this.products.map(prod => {
+          if(prod.id == product.id){
+            return {... product}
+          }else{
+            return prod;
+          }
+        });
       });
     }else{
-      product.id = new Date().getTime();
-      this.products.push(product);
+      this.service.create(product).subscribe(productNew => {
+        // product.id = new Date().getTime();
+        this.products.push(productNew);
+        // this.products = [...this.products, {...productNew}]
+      });
     }
     this.productSelected = new Product();
-    // this.products = [...this.products, {...product, id: new Date().getTime()}]
+    
   }
 
   onRemoveProduct(id: number): void{
-    this.products = this.products.filter(product => product.id != id);
+    this.service.remove(id).subscribe(() => {
+      this.products = this.products.filter(product => product.id != id);
+    });
   }
 
   onUpdateProduct(product: Product): void {
